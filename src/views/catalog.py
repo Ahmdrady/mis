@@ -48,13 +48,12 @@ def render(state: DashboardState) -> None:
     )
 
     try:
-        payload = generate_inflation_report(
-            filtered,
-            {
-                "report_title": "Data Catalog Export",
-                "scope": f"Region: {region} | Search: {search_country or 'All'}",
-            },
-        )
+        meta = {
+            "report_title": "Data Catalog Export",
+            "report_subtitle": f"Region filter: {region} | Search: {search_country or 'All'}",
+            "scope": state.filters.get("scope_label", "Global selection"),
+        }
+        payload = generate_inflation_report(filtered, meta)
         st.download_button(
             "Download Excel Workbook",
             data=payload,

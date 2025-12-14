@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from typing import Dict
+
 import pandas as pd
 import plotly.express as px
 import streamlit as st
@@ -20,7 +22,7 @@ def render(state: DashboardState) -> None:
     render_era_table(df)
     render_global_timeline(df)
     render_record_board(df)
-    render_export(df)
+    render_export(df, state.filters)
 
 
 def render_global_kpis(df: pd.DataFrame) -> None:
@@ -148,11 +150,11 @@ def render_record_board(df: pd.DataFrame) -> None:
     )
 
 
-def render_export(df: pd.DataFrame) -> None:
+def render_export(df: pd.DataFrame, filters: Dict) -> None:
     st.markdown("### Export Full Historical Workbook")
     meta = {
         "report_title": "Global Inflation Intelligence Hub",
-        "scope": "Global Storyboard",
+        "scope": filters.get("scope_label", "Global Storyboard"),
     }
     try:
         payload = generate_inflation_report(df, meta)
