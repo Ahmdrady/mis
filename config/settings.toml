@@ -1,0 +1,9 @@
+[data]
+raw_dir = "data/raw"
+processed_dir = "data/processed"
+raw_file = "food_price_inflation.csv"
+processed_file = "food_price_inflation.parquet"
+
+[pipeline]
+parquet_engine = "pyarrow"
+compression = "snappy"
