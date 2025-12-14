@@ -91,10 +91,7 @@ def apply_global_controls(df: pd.DataFrame) -> Tuple[pd.DataFrame, Dict]:
         min_value=min_period.to_pydatetime(),
         max_value=max_period.to_pydatetime(),
     )
-    if isinstance(date_selection, tuple) and len(date_selection) == 2:
-        start_date, end_date = date_selection
-    else:
-        start_date = end_date = date_selection
+    start_date, end_date = _normalize_date_selection(date_selection, default_range)
     if start_date > end_date:
         start_date, end_date = end_date, start_date
     start_ts = pd.Timestamp(start_date)
@@ -165,6 +162,30 @@ def _format_scope_label(
         f"{start:%Y-%m} → {end:%Y-%m} | Regions: {region_label} | "
         f"Eras: {era_label} | Sample ≤{max_countries} countries"
     )
+
+
+def _normalize_date_selection(selection, default_range):
+    if isinstance(selection, tuple):
+        flat = []
+        for item in selection:
+            if isinstance(item, tuple):
+                flat.extend(item)
+            else:
+                flat.append(item)
+        if len(flat) >= 2:
+            start_date, end_date = flat[0], flat[1]
+        elif len(flat) == 1:
+            start_date = end_date = flat[0]
+        else:
+            start_date, end_date = default_range
+    else:
+        start_date = end_date = selection
+
+    start_ts = pd.Timestamp(start_date)
+    end_ts = pd.Timestamp(end_date)
+    if start_ts > end_ts:
+        start_ts, end_ts = end_ts, start_ts
+    return start_ts, end_ts + pd.offsets.MonthEnd(0)
 
 
 def main() -> None:
